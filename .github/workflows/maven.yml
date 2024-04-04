@@ -23,10 +23,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: ${{ JAVA_DISTRIBUTION }}
-          java-package: ${{ JAVA_PACKAGE }}
-          java-version: ${{ JAVA_VERSION }}
-          cache: ${{ MAVEN_CACHE }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: ${{ env.JAVA_PACKAGE }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: ${{ env.MAVEN_CACHE }}
 
       - name: mvn compile
         run: ./mvnw -f pom.xml -B compile
@@ -41,10 +41,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: ${{ JAVA_DISTRIBUTION }}
-          java-package: ${{ JAVA_PACKAGE }}
-          java-version: ${{ JAVA_VERSION }}
-          cache: ${{ MAVEN_CACHE }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: ${{ env.JAVA_PACKAGE }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: ${{ env.MAVEN_CACHE }}
 
       - name: mvn test
         run: ./mvnw -f pom.xml -B test
@@ -59,10 +59,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: ${{ JAVA_DISTRIBUTION }}
-          java-package: ${{ JAVA_PACKAGE }}
-          java-version: ${{ JAVA_VERSION }}
-          cache: ${{ MAVEN_CACHE }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: ${{ env.JAVA_PACKAGE }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: ${{ env.MAVEN_CACHE }}
 
       - name: mvn package without tests
         run: ./mvnw -f pom.xml -B package -DskipTests
