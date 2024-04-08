@@ -42,6 +42,39 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: compile
+    name: Run tests with JaCoCo
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: ${{ env.JAVA_PACKAGE }}
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: ${{ env.MAVEN_CACHE }}
+
+      - name: Download ${{ env.MAVEN_OUTPUT }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.MAVEN_OUTPUT }}
+
+      - name: mvn test-compile
+        run: ./mvnw -f pom.xml -B test-compile
+
+      - name: mvn test with JaCoCo
+        run: ./mvnw -f pom.xml -B mvn org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco
+          path: ${{ env.MAVEN_OUTPUT }}/site/jacoco
+          retention-days: 7
+
+  analyse:
+    runs-on: ubuntu-latest
+    needs: compile
     name: Run tests
     steps:
       - uses: actions/checkout@v3
@@ -59,8 +92,27 @@ jobs:
         with:
           name: ${{ env.MAVEN_OUTPUT }}
 
-      - name: mvn test
-        run: ./mvnw -f pom.xml -B surefire:test
+      - name: mvn spotbugs
+        run: ./mvnw com.github.spotbugs:spotbugs-maven-plugin:spotbugs
+
+      - name: Upload SpotBugs Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpotBugs
+          path: ${{ env.MAVEN_OUTPUT }}/spotbugsXml.xml
+          retention-days: 1
+
+      - name: mvn cyclonedx software bill of material (SBOM)
+        run: ./mvnw org.cyclonedx:cyclonedx-maven-plugin:makeBom
+
+      - name: Upload SBOM Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SBOM
+          path: |
+            ${{ env.MAVEN_OUTPUT }}/bom.json
+            ${{ env.MAVEN_OUTPUT }}/bom.xml
+          retention-days: 1
 
   package:
     runs-on: ubuntu-latest
