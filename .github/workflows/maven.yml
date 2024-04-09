@@ -27,13 +27,11 @@ jobs:
         env:
           cache-name: cache-maven-dependencies
         with:
-          path: |
-            ~/.m2
-            ~/repository
-          key: setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
-            setup-java-Linux-maven-
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -67,13 +65,11 @@ jobs:
         env:
           cache-name: cache-maven-dependencies
         with:
-          path: |
-            ~/.m2
-            ~/repository
-          key: setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
-            setup-java-Linux-maven-
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -115,13 +111,11 @@ jobs:
         env:
           cache-name: cache-maven-dependencies
         with:
-          path: |
-            ~/.m2
-            ~/repository
-          key: setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
-            setup-java-Linux-maven-
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -172,13 +166,11 @@ jobs:
         env:
           cache-name: cache-maven-dependencies
         with:
-          path: |
-            ~/.m2
-            ~/repository
-          key: setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            setup-java-Linux-maven-${{ hashFiles('**/pom.xml') }}
-            setup-java-Linux-maven-
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
