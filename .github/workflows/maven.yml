@@ -16,7 +16,7 @@ env:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    name: compile
+    name: Compile source code
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -41,7 +41,6 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: ${{ env.JAVA_PACKAGE }}
           java-version: ${{ env.JAVA_VERSION }}
-          #cache: ${{ env.MAVEN_CACHE }}
 
       - name: mvn compile
         run: ./mvnw -f pom.xml -B compile
