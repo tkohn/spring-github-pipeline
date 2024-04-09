@@ -1,0 +1,54 @@
+name: OWASP Dependency Check
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+env:
+  JAVA_DISTRIBUTION: temurin
+  JAVA_PACKAGE: jdk
+  JAVA_VERSION: '17'
+  MAVEN_OUTPUT: target
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    name: dependency-check
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Restore maven dependencies cache
+        id: cache-maven
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-package: ${{ env.JAVA_PACKAGE }}
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: mvn package and dependency-check
+        run: ./mvnw  --no-transfer-progress clean package -DskipTests -DskipITs -DnvdApiKey=${{secrets.NVDAPIKEY}} -Dmax.cvss.score=8 -Dformat=ALL org.owasp:dependency-check-maven:check -l ${{github.workspace}}/mvn-output.txt
+
+      - name: Upload SARIF file to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ env.MAVEN_OUTPUT }}/dependency-check-report.sarif
+          category: dependency-check
+
+      - name: Upload dependency-check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: ${{ env.MAVEN_OUTPUT }}/dependency-check-report.html
+          retention-days: 1
