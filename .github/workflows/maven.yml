@@ -10,8 +10,8 @@ env:
   JAVA_DISTRIBUTION: temurin
   JAVA_PACKAGE: jdk
   JAVA_VERSION: '17'
-  MAVEN_CACHE: maven
-  MAVEN_OUTPUT: target
+  MAVEN_TARGET_AFTER_COMPILE: target-after-compile
+  MAVEN_TARGET_AFTER_TEST: target-after-test
 
 jobs:
   compile:
@@ -45,11 +45,11 @@ jobs:
       - name: mvn compile
         run: ./mvnw -f pom.xml -B compile
 
-      - name: Upload ${{ env.MAVEN_OUTPUT }}
+      - name: Upload ${{ env.MAVEN_TARGET_AFTER_COMPILE }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.MAVEN_OUTPUT }}
-          path: ${{ env.MAVEN_OUTPUT }}
+          name: ${{ env.MAVEN_TARGET_AFTER_COMPILE }}
+          path: target
           retention-days: 1
 
   test:
@@ -80,12 +80,11 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: ${{ env.JAVA_PACKAGE }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: ${{ env.MAVEN_CACHE }}
 
-      - name: Download ${{ env.MAVEN_OUTPUT }}
+      - name: Download ${{ env.MAVEN_TARGET_AFTER_COMPILE }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.MAVEN_OUTPUT }}
+          name: ${{ env.MAVEN_TARGET_AFTER_COMPILE }}
 
       - name: mvn test-compile
         run: ./mvnw -f pom.xml -B test-compile
@@ -97,19 +96,21 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco
-          path: ${{ env.MAVEN_OUTPUT }}/site/jacoco
+          path: target/site/jacoco
           retention-days: 7
 
-      - name: Upload ${{ env.MAVEN_OUTPUT }}
+      - name: Upload ${{ env.MAVEN_TARGET_AFTER_TEST }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.MAVEN_OUTPUT }}
-          path: ${{ env.MAVEN_OUTPUT }}
+          name: ${{ env.MAVEN_TARGET_AFTER_TEST }}
+          path: target
           retention-days: 1
 
   analyse:
     runs-on: ubuntu-latest
-    needs: compile
+    needs:
+      - compile
+      - test
     name: SpotBugs and SBOM
     steps:
       - name: Checkout Source Code
@@ -129,10 +130,10 @@ jobs:
             ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
             ${{ runner.os }}-maven-
 
-      - name: Download ${{ env.MAVEN_OUTPUT }}
+      - name: Download ${{ env.MAVEN_TARGET_AFTER_TEST }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.MAVEN_OUTPUT }}
+          name: ${{ env.MAVEN_TARGET_AFTER_TEST }}
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -140,12 +141,6 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: ${{ env.JAVA_PACKAGE }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: ${{ env.MAVEN_CACHE }}
-
-      - name: Download ${{ env.MAVEN_OUTPUT }}
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.MAVEN_OUTPUT }}
 
       - name: mvn spotbugs
         run: ./mvnw -f pom.xml -B com.github.spotbugs:spotbugs-maven-plugin:spotbugs
@@ -154,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SpotBugs
-          path: ${{ env.MAVEN_OUTPUT }}/spotbugsXml.xml
+          path: target/spotbugsXml.xml
           retention-days: 1
 
       - name: mvn cyclonedx software bill of material (SBOM)
@@ -165,8 +160,8 @@ jobs:
         with:
           name: SBOM
           path: |
-            ${{ env.MAVEN_OUTPUT }}/bom.json
-            ${{ env.MAVEN_OUTPUT }}/bom.xml
+            target/bom.json
+            target/bom.xml
           retention-days: 1
 
   package:
@@ -197,12 +192,11 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-package: ${{ env.JAVA_PACKAGE }}
           java-version: ${{ env.JAVA_VERSION }}
-          cache: ${{ env.MAVEN_CACHE }}
 
       - name: Download ${{ env.MAVEN_OUTPUT }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.MAVEN_OUTPUT }}
+          name: ${{ env.MAVEN_TARGET_AFTER_COMPILE }}
 
       - name: mvn package without tests
         run: ./mvnw -f pom.xml -B package -DskipTests
