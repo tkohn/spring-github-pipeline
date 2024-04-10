@@ -134,6 +134,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.MAVEN_TARGET_AFTER_TEST }}
+          path: target
 
       - name: Setup Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -145,7 +146,7 @@ jobs:
       - name: debugging
         run: ls -la && pwd && ls -la ~/
       - name: mvn spotbugs
-        run: ./mvnw -f pom.xml -B -X com.github.spotbugs:spotbugs-maven-plugin:spotbugs
+        run: ./mvnw -f pom.xml -B com.github.spotbugs:spotbugs-maven-plugin:spotbugs
 
       - name: Upload SpotBugs Report
         uses: actions/upload-artifact@v4
