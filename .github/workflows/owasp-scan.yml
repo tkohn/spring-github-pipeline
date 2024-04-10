@@ -40,7 +40,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: mvn package and dependency-check
-        run: ./mvnw  --no-transfer-progress clean package -DskipTests -DskipITs -DnvdApiKey=${{secrets.NVDAPIKEY}} -Dmax.cvss.score=8 -Dformat=ALL org.owasp:dependency-check-maven:check -l ${{github.workspace}}/mvn-output.txt
+        run: ./mvnw  --no-transfer-progress clean package -DskipTests -DskipITs -DnvdApiKey=${{secrets.NVDAPIKEY}} -Dmax.cvss.score=8 -DfailBuildOnCVSS=8 -Dformats=HTML,SARIF org.owasp:dependency-check-maven:check
 
       - name: Upload SARIF file to code scanning
         uses: github/codeql-action/upload-sarif@v3
