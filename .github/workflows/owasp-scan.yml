@@ -3,6 +3,7 @@ name: OWASP Dependency Check
 on:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
 
 env:
   JAVA_DISTRIBUTION: temurin
@@ -23,6 +24,7 @@ jobs:
         id: cache-maven
         uses: actions/cache/restore@v4
         with:
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           path: |
             ~/.m2/repository
             ~/.m2/wrapper
