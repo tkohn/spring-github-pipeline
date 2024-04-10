@@ -142,8 +142,10 @@ jobs:
           java-package: ${{ env.JAVA_PACKAGE }}
           java-version: ${{ env.JAVA_VERSION }}
 
+      - name: debugging
+        run: ls -la /target
       - name: mvn spotbugs
-        run: ./mvnw -f pom.xml -B com.github.spotbugs:spotbugs-maven-plugin:spotbugs
+        run: ./mvnw -f pom.xml -B -X com.github.spotbugs:spotbugs-maven-plugin:spotbugs
 
       - name: Upload SpotBugs Report
         uses: actions/upload-artifact@v4
